@@ -945,6 +945,14 @@ class Parameter(ParameterBase):
 
             self._prior = prior
 
+            # check the value of the parameter at the prior bounds
+            
+            if self._prior(self.value) <= 0.:
+
+                warnings.warn('The current value of %s is outside its prior bounds. This can cause issues with sampling.')
+
+                
+
     prior = property(_get_prior, _set_prior,
                      doc='Gets or sets the current prior for this parameter. The prior must be a callable function '
                          "accepting the current value of the parameter as input and returning the probability "
