@@ -941,7 +941,7 @@ class Parameter(ParameterBase):
 
             except AttributeError:
 
-                raise NotCallableOrErrorInCall("It looks like the provided prior is not a astromodels function.")
+                raise NotCallableOrErrorInCall("It looks like the provided prior is not an astromodels function.")
 
             self._prior = prior
 
