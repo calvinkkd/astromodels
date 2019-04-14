@@ -1,3 +1,3 @@
-__author__ = 'giacomov'
+__author__ = "giacomov"
 
 __all__ = ["PointSource", "ExtendedSource", "ParticleSource"]

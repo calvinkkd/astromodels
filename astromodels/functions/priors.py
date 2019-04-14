@@ -2,13 +2,17 @@ import math
 
 import astropy.units as astropy_units
 import numpy as np
-from scipy.special import  erfcinv, erf
+from scipy.special import erfcinv, erf
 
-from astromodels.functions.function import Function1D, FunctionMeta, ModelAssertionViolation
+from astromodels.functions.function import (
+    Function1D,
+    FunctionMeta,
+    ModelAssertionViolation,
+)
 
 
-deg2rad = np.pi/180.
-rad2deg = 180./np.pi
+deg2rad = np.pi / 180.0
+rad2deg = 180.0 / np.pi
 
 # noinspection PyPep8Naming
 class Gaussian(Function1D):
@@ -70,7 +74,7 @@ class Gaussian(Function1D):
 
         norm = self.__norm_const / sigma
 
-        return F * norm * np.exp(-np.power(x - mu, 2.) / (2 * np.power(sigma, 2.)))
+        return F * norm * np.exp(-np.power(x - mu, 2.0) / (2 * np.power(sigma, 2.0)))
 
     def from_unit_cube(self, x):
         """
@@ -96,6 +100,7 @@ class Gaussian(Function1D):
             res = mu + sigma * sqrt_two * erfcinv(2 * (1 - x))
 
         return res
+
 
 class Truncated_gaussian(Function1D):
     r"""
@@ -168,17 +173,15 @@ class Truncated_gaussian(Function1D):
         # sigma has the same dimensions as x
         self.sigma.unit = x_unit
 
-
     # noinspection PyPep8Naming
     def evaluate(self, x, F, mu, sigma, lower_bound, upper_bound):
-
 
         # phi is in unitless, so we need to do this trick
         # to keep the units right
 
         norm = self.__norm_const / sigma
 
-        phi = np.zeros(x.shape) * F * norm * 0.
+        phi = np.zeros(x.shape) * F * norm * 0.0
         idx = (x >= lower_bound) & (x <= upper_bound)
 
         sqrt_two = 1.414213562
@@ -188,14 +191,13 @@ class Truncated_gaussian(Function1D):
         lower_arg = (lower_bound - mu) / sigma
         upper_arg = (upper_bound - mu) / sigma
 
-
-
         # the typical gaussian functions
 
-        phi[idx] = np.exp(-np.power(x[idx] - mu, 2.) / (2 * np.power(sigma, 2.))) * F * norm
+        phi[idx] = (
+            np.exp(-np.power(x[idx] - mu, 2.0) / (2 * np.power(sigma, 2.0))) * F * norm
+        )
 
         # the denominator is a function of the CDF
-
 
         if isinstance(F, astropy_units.Quantity):
             # erf cannot accept units
@@ -206,9 +208,6 @@ class Truncated_gaussian(Function1D):
         theta_lower = 0.5 + 0.5 * erf(lower_arg / sqrt_two)
 
         theta_upper = 0.5 + 0.5 * erf(upper_arg / sqrt_two)
-
-
-
 
         return phi / (theta_upper - theta_lower)
 
@@ -238,8 +237,9 @@ class Truncated_gaussian(Function1D):
         arg = theta_lower + x * (theta_upper - theta_lower)
 
         out = mu + sigma * sqrt_two * erfcinv(2 * (1 - arg))
-        
+
         return np.clip(out, lower_bound, upper_bound)
+
 
 class Cauchy(Function1D):
     r"""
@@ -357,15 +357,16 @@ class Cosine_Prior(Function1D):
 
     __metaclass__ = FunctionMeta
 
-
     def _setup(self):
 
-        self._fixed_units = (astropy_units.dimensionless_unscaled,astropy_units.dimensionless_unscaled)
+        self._fixed_units = (
+            astropy_units.dimensionless_unscaled,
+            astropy_units.dimensionless_unscaled,
+        )
 
         self._is_prior = True
 
     def _set_units(self, x_unit, y_unit):
-
 
         # this prior needs to use the fixed units and
         # they do not need to be converted as they have no
@@ -386,20 +387,20 @@ class Cosine_Prior(Function1D):
 
         return True
 
-    def evaluate(self, x, lower_bound, upper_bound,value):
+    def evaluate(self, x, lower_bound, upper_bound, value):
         # The value * 0 is to keep the units right
 
         result = np.zeros(x.shape) * value * 0
 
         idx = (x >= lower_bound) & (x <= upper_bound)
 
-        norm = (np.sin(deg2rad*(upper_bound)) - np.sin(deg2rad*(lower_bound))) * 57.29577795
+        norm = (
+            np.sin(deg2rad * (upper_bound)) - np.sin(deg2rad * (lower_bound))
+        ) * 57.29577795
 
-
-        result[idx] = value * np.cos(deg2rad*( x[idx] )) / norm
+        result[idx] = value * np.cos(deg2rad * (x[idx])) / norm
 
         return result
-
 
     def from_unit_cube(self, x):
         """
@@ -410,8 +411,8 @@ class Cosine_Prior(Function1D):
         :param upper_bound:
         :return:
         """
-        cosdec_min = np.cos(deg2rad*(90.0 + self.lower_bound.value))
-        cosdec_max = np.cos(deg2rad*(90.0 + self.upper_bound.value))
+        cosdec_min = np.cos(deg2rad * (90.0 + self.lower_bound.value))
+        cosdec_max = np.cos(deg2rad * (90.0 + self.upper_bound.value))
 
         v = x * (cosdec_max - cosdec_min)
         v += cosdec_min
@@ -498,10 +499,17 @@ class Log_normal(Function1D):
 
         # The log normal is not defined if x < 0. The "0 * x" part is to conserve the units if
         # x has them, because 0 * x will be a Quantity with the same units as x
-        idx = (x > 0 * x)
+        idx = x > 0 * x
 
-        result[idx] = F * self.__norm_const / (sigma / piv * x / piv) * np.exp(
-            -np.power(np.log(x / piv) - mu / piv, 2.) / (2 * np.power(sigma / piv, 2.)))
+        result[idx] = (
+            F
+            * self.__norm_const
+            / (sigma / piv * x / piv)
+            * np.exp(
+                -np.power(np.log(x / piv) - mu / piv, 2.0)
+                / (2 * np.power(sigma / piv, 2.0))
+            )
+        )
 
         return result
 
@@ -590,7 +598,6 @@ class Uniform_prior(Function1D):
 
         return result
 
-
     def from_unit_cube(self, x):
         """
         Used by multinest
@@ -610,6 +617,7 @@ class Uniform_prior(Function1D):
         par = x * spread + low
 
         return par
+
 
 class Log_uniform_prior(Function1D):
     r"""

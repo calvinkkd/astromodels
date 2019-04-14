@@ -12,7 +12,7 @@ from astromodels.sources.source import Source, POINT_SOURCE
 from astromodels.utils.pretty_list import dict_to_list
 from astromodels.core.memoization import use_astromodels_memoization
 
-__author__ = 'giacomov'
+__author__ = "giacomov"
 
 
 __all__ = ["PointSource"]
@@ -54,8 +54,17 @@ class PointSource(Source, Node):
     :return:
     """
 
-    def __init__(self, source_name, ra=None, dec=None, spectral_shape=None,
-                 l=None, b=None, components=None, sky_position=None):
+    def __init__(
+        self,
+        source_name,
+        ra=None,
+        dec=None,
+        spectral_shape=None,
+        l=None,
+        b=None,
+        components=None,
+        sky_position=None,
+    ):
 
         # Check that we have all the required information
 
@@ -63,9 +72,11 @@ class PointSource(Source, Node):
 
         # Check that we have one and only one specification of the position
 
-        assert ((ra is not None and dec is not None) ^
-                (l is not None and b is not None) ^
-                (sky_position is not None)), "You have to provide one and only one specification for the position"
+        assert (
+            (ra is not None and dec is not None)
+            ^ (l is not None and b is not None)
+            ^ (sky_position is not None)
+        ), "You have to provide one and only one specification for the position"
 
         # Gather the position
 
@@ -82,8 +93,10 @@ class PointSource(Source, Node):
 
                 except (TypeError, ValueError):
 
-                    raise AssertionError("RA and Dec must be numbers. If you are confused by this message, you "
-                                         "are likely using the constructor in the wrong way. Check the documentation.")
+                    raise AssertionError(
+                        "RA and Dec must be numbers. If you are confused by this message, you "
+                        "are likely using the constructor in the wrong way. Check the documentation."
+                    )
 
                 sky_position = SkyDirection(ra=ra, dec=dec)
 
@@ -98,9 +111,11 @@ class PointSource(Source, Node):
         # We need either a single component, or a list of components, but not both
         # (that's the ^ symbol)
 
-        assert (spectral_shape is not None) ^ (components is not None), "You have to provide either a single " \
-                                                                        "component, or a list of components " \
-                                                                        "(but not both)."
+        assert (spectral_shape is not None) ^ (components is not None), (
+            "You have to provide either a single "
+            "component, or a list of components "
+            "(but not both)."
+        )
 
         # If the user specified only one component, make a list of one element with a default name ("main")
 
@@ -120,7 +135,7 @@ class PointSource(Source, Node):
 
         # Add a node called 'spectrum'
 
-        spectrum_node = Node('spectrum')
+        spectrum_node = Node("spectrum")
         spectrum_node._add_children(self._components.values())
 
         self._add_child(spectrum_node)
@@ -133,7 +148,9 @@ class PointSource(Source, Node):
         # Components in this case have energy as x and differential flux as y
 
         x_unit = current_units.energy
-        y_unit = (current_units.energy * current_units.area * current_units.time) ** (-1)
+        y_unit = (current_units.energy * current_units.area * current_units.time) ** (
+            -1
+        )
 
         # Now set the units of the components
         for component in self._components.values():
@@ -207,7 +224,9 @@ class PointSource(Source, Node):
                             return reentrant_call(e, tag=None)
 
                         # Now integrate
-                        integrals[i] = scipy.integrate.quad(integral, a, b, epsrel=1e-5)[0]
+                        integrals[i] = scipy.integrate.quad(
+                            integral, a, b, epsrel=1e-5
+                        )[0]
 
                 return integrals / (b - a)
 
@@ -296,15 +315,14 @@ class PointSource(Source, Node):
 
         repr_dict = collections.OrderedDict()
 
-        key = '%s (point source)' % self.name
+        key = "%s (point source)" % self.name
 
         repr_dict[key] = collections.OrderedDict()
-        repr_dict[key]['position'] = self._sky_position.to_dict(minimal=True)
-        repr_dict[key]['spectrum'] = collections.OrderedDict()
+        repr_dict[key]["position"] = self._sky_position.to_dict(minimal=True)
+        repr_dict[key]["spectrum"] = collections.OrderedDict()
 
         for component_name, component in self.components.iteritems():
 
-            repr_dict[key]['spectrum'][component_name] = component.to_dict(minimal=True)
+            repr_dict[key]["spectrum"][component_name] = component.to_dict(minimal=True)
 
         return dict_to_list(repr_dict, rich_output)
-

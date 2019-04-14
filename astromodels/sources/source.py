@@ -1,11 +1,11 @@
-__author__ = 'giacomov'
+__author__ = "giacomov"
 
 import collections
 import exceptions
 
-PARTICLE_SOURCE = 'particle source'
-POINT_SOURCE = 'point source'
-EXTENDED_SOURCE = 'extended source'
+PARTICLE_SOURCE = "particle source"
+POINT_SOURCE = "point source"
+EXTENDED_SOURCE = "extended source"
 
 
 class UnknownSourceType(exceptions.Exception):
@@ -13,7 +13,6 @@ class UnknownSourceType(exceptions.Exception):
 
 
 class Source(object):
-
     def __init__(self, list_of_components, src_type, spatial_shape=None):
 
         # Make the dictionary of components

@@ -7,11 +7,11 @@ __all__ = []
 # copyreg is called copy_reg in python2
 try:
 
-    import copyreg #py3
+    import copyreg  # py3
 
 except ImportError:
 
-    import copy_reg as copyreg #py2
+    import copy_reg as copyreg  # py2
 
 
 # Model serializer
@@ -25,6 +25,7 @@ def serialize_model(model):
 def unserialize_model(dict_with_types):
 
     return ModelParser(model_dict=dict_with_types).get_model()
+
 
 # Register serialization/unserialization for Model
 copyreg.constructor(unserialize_model)

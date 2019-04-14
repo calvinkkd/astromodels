@@ -32,7 +32,6 @@ def use_astromodels_memoization(switch, cache_size=_CACHE_SIZE):
     _CACHE_SIZE = old_cache_size
 
 
-
 def memoize(method):
     """
     A decorator for functions of sources which memoize the results of the last _CACHE_SIZE calls,
@@ -58,7 +57,11 @@ def memoize(method):
 
         # Create a tuple because a tuple is hashable
 
-        unique_id = tuple(float(yy.value) for yy in instance.parameters.values()) + (x.size, x.min(), x.max())
+        unique_id = tuple(float(yy.value) for yy in instance.parameters.values()) + (
+            x.size,
+            x.min(),
+            x.max(),
+        )
 
         # Create a unique identifier for this combination of inputs
 

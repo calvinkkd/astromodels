@@ -21,7 +21,7 @@ def xspec_abund(command_string=None):
         _xspec.set_xsabund(command_string)
 
 
-def xspec_cosmo(H0=None,q0=None,lambda_0=None):
+def xspec_cosmo(H0=None, q0=None, lambda_0=None):
     """
     Define the Cosmology in use within the XSpec models. See Xspec manual for help:
 
@@ -41,7 +41,6 @@ def xspec_cosmo(H0=None,q0=None,lambda_0=None):
 
         return current_settings
 
-
     else:
 
         # ok, we will see what was changed by the used
@@ -56,7 +55,6 @@ def xspec_cosmo(H0=None,q0=None,lambda_0=None):
                 # so lets keep what was already set
 
                 user_inputs[i] = current_setting
-
 
         # pass this to xspec
 

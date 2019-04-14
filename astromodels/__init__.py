@@ -1,5 +1,6 @@
 # Import the version
 from version import __version__
+
 #
 #
 
@@ -17,7 +18,7 @@ if os.environ.get("ASTROMODELS_DEBUG", None) is None:
     from .functions.functions_2D import *
     from .functions.functions_3D import *
     from .functions.template_model import *
-    from .functions. dark_matter.dm_models import *
+    from .functions.dark_matter.dm_models import *
     from .functions.function import list_functions, get_function_class
     from .core.model import Model
     from .core.parameter import Parameter

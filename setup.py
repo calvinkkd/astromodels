@@ -13,8 +13,8 @@ from setuptools.command.build_ext import build_ext as _build_ext
 # This is needed to use numpy in this module, and should work whether or not numpy is
 # already installed. If it's not, it will trigger an installation
 
-class My_build_ext(_build_ext):
 
+class My_build_ext(_build_ext):
     def finalize_options(self):
 
         _build_ext.finalize_options(self)
@@ -26,7 +26,7 @@ class My_build_ext(_build_ext):
         import numpy
 
         self.include_dirs.append(numpy.get_include())
-        self.include_dirs.append('astromodels/xspec/include')
+        self.include_dirs.append("astromodels/xspec/include")
 
 
 def sanitize_lib_name(library_path):
@@ -45,8 +45,10 @@ def sanitize_lib_name(library_path):
     tokens = re.findall("lib(.+)(\.so|\.dylib|\.a)(.+)?", lib_name)
 
     if not tokens:
-        raise RuntimeError('Attempting to find %s in directory %s but there are no libraries in this directory'%(lib_name,library_path))
-
+        raise RuntimeError(
+            "Attempting to find %s in directory %s but there are no libraries in this directory"
+            % (lib_name, library_path)
+        )
 
     return tokens[0][0]
 
@@ -138,7 +140,12 @@ def find_library(library_root, additional_places=None):
 
                 for result in results:
 
-                    if re.match("lib%s[\-_\.]" % library_root, os.path.basename(result)) is None:
+                    if (
+                        re.match(
+                            "lib%s[\-_\.]" % library_root, os.path.basename(result)
+                        )
+                        is None
+                    ):
 
                         continue
 
@@ -174,8 +181,8 @@ def find_library(library_root, additional_places=None):
 
 # Get the version number
 vfilename = "astromodels/version.py"
-exec(compile(open(vfilename, "rb").read(), vfilename, 'exec'))
-#execfile('astromodels/version.py')
+exec(compile(open(vfilename, "rb").read(), vfilename, "exec"))
+# execfile('astromodels/version.py')
 
 
 def setup_xspec():
@@ -186,11 +193,11 @@ def setup_xspec():
 
         # See, maybe we are running in Conda
         conda_prefix = os.environ.get("CONDA_PREFIX")
-        
+
         if conda_prefix is None:
-            
+
             # Maybe this is a Conda build
-            
+
             conda_prefix = os.environ.get("PREFIX")
 
         if conda_prefix is not None:
@@ -198,13 +205,17 @@ def setup_xspec():
             # Yes, this is Conda
             # Let's see if the package xspec-modelsonly has been installed by checking whether one of the Xspec
             # libraries exists within conda
-            conda_lib_path = os.path.join(conda_prefix, 'lib')
-            this_lib, this_lib_path = find_library('XSFunctions', additional_places=[conda_lib_path])
+            conda_lib_path = os.path.join(conda_prefix, "lib")
+            this_lib, this_lib_path = find_library(
+                "XSFunctions", additional_places=[conda_lib_path]
+            )
 
             if this_lib is None:
 
                 # No, there is no library in Conda
-                print("No xspec-modelsonly package has been installed in Conda. Xspec support will not be installed")
+                print(
+                    "No xspec-modelsonly package has been installed in Conda. Xspec support will not be installed"
+                )
 
                 print("Was looking into %s" % conda_lib_path)
 
@@ -212,7 +223,9 @@ def setup_xspec():
 
             else:
 
-                print("The xspec-modelsonly package has been installed in Conda. Xspec support will be installed")
+                print(
+                    "The xspec-modelsonly package has been installed in Conda. Xspec support will be installed"
+                )
 
                 # Set up the HEADAS variable so that the following will find the libraries
                 headas_root = conda_prefix
@@ -229,19 +242,32 @@ def setup_xspec():
 
     # Make sure these libraries exist and are linkable right now
     # (they need to be in LD_LIBRARY_PATH or DYLD_LIBRARY_PATH or in one of the system paths)
-    
-    libraries_root = ['XSFunctions', 'XSModel', 'XSUtil', 'XS', 'cfitsio', 'CCfits', 'wcs', 'gfortran']
-            
+
+    libraries_root = [
+        "XSFunctions",
+        "XSModel",
+        "XSUtil",
+        "XS",
+        "cfitsio",
+        "CCfits",
+        "wcs",
+        "gfortran",
+    ]
+
     libraries = []
     library_dirs = []
 
     for lib_root in libraries_root:
 
-        this_library, this_library_path = find_library(lib_root, additional_places=[os.path.join(headas_root, 'lib')])
+        this_library, this_library_path = find_library(
+            lib_root, additional_places=[os.path.join(headas_root, "lib")]
+        )
 
         if this_library is None:
 
-            raise IOError("Could not find library %s. Impossible to compile Xspec" % lib_root)
+            raise IOError(
+                "Could not find library %s. Impossible to compile Xspec" % lib_root
+            )
 
         else:
 
@@ -262,30 +288,31 @@ def setup_xspec():
 
     # Configure the variables to build the external module with the C/C++ wrapper
     ext_modules_configuration = [
-
-        Extension("astromodels.xspec._xspec",
-
-                  ["astromodels/xspec/src/_xspec.cc", ],
-
-                  libraries=libraries,
-                  library_dirs=library_dirs,
-                  runtime_library_dirs=library_dirs,
-                  extra_compile_args=[])]
+        Extension(
+            "astromodels.xspec._xspec",
+            ["astromodels/xspec/src/_xspec.cc"],
+            libraries=libraries,
+            library_dirs=library_dirs,
+            runtime_library_dirs=library_dirs,
+            extra_compile_args=[],
+        )
+    ]
 
     return ext_modules_configuration
 
 
 # Normal packages
 
-packages = ['astromodels',
-            'astromodels/core',
-            'astromodels/functions',
-            'astromodels/functions/dark_matter',
-            'astromodels/sources',
-            'astromodels/utils',
-            'astromodels/xspec',
-            'astromodels/tests'
-            ]
+packages = [
+    "astromodels",
+    "astromodels/core",
+    "astromodels/functions",
+    "astromodels/functions/dark_matter",
+    "astromodels/sources",
+    "astromodels/utils",
+    "astromodels/xspec",
+    "astromodels/tests",
+]
 
 # Check whether we can compile Xspec support
 ext_modules_configuration = setup_xspec()
@@ -293,9 +320,11 @@ ext_modules_configuration = setup_xspec()
 # Add the node_ctype module
 
 # This defines the external module
-node_ctype_ext = Extension('astromodels.core.node_ctype',
-                           sources = ['astromodels/core/node_ctype/node_ctype.cxx'],
-                           extra_compile_args=[]) # '-UNDEBUG' for debugging
+node_ctype_ext = Extension(
+    "astromodels.core.node_ctype",
+    sources=["astromodels/core/node_ctype/node_ctype.cxx"],
+    extra_compile_args=[],
+)  # '-UNDEBUG' for debugging
 
 
 if ext_modules_configuration is None:
@@ -310,57 +339,36 @@ else:
 
 setup(
     name="astromodels",
-
-    setup_requires=['numpy'],
-
-    cmdclass={'build_ext': My_build_ext},
-
+    setup_requires=["numpy"],
+    cmdclass={"build_ext": My_build_ext},
     packages=packages,
-
-    data_files=[('astromodels/data/functions', glob.glob('astromodels/data/functions/*.yaml'))],
-
+    data_files=[
+        ("astromodels/data/functions", glob.glob("astromodels/data/functions/*.yaml"))
+    ],
     # The __version__ comes from the exec at the top
-
     version=__version__,
-
     description="Astromodels contains models to be used in likelihood or Bayesian analysis in astronomy",
-
-    author='Giacomo Vianello',
-
-    author_email='giacomo.vianello@gmail.com',
-
-    url='https://github.com/giacomov/astromodels',
-
-    download_url='https://github.com/giacomov/astromodels/archive/v0.1',
-
-    keywords=['Likelihood', 'Models', 'fit'],
-
+    author="Giacomo Vianello",
+    author_email="giacomo.vianello@gmail.com",
+    url="https://github.com/giacomov/astromodels",
+    download_url="https://github.com/giacomov/astromodels/archive/v0.1",
+    keywords=["Likelihood", "Models", "fit"],
     classifiers=[],
-    
     install_requires=[
-        'numpy >= 1.6',
-        'PyYAML==3.13', # newer pyaml breaks models,
-        'astropy >= 1.2',
-        'scipy>=0.14',
-        'numdifftools',
-        'tables',
-        'pandas',
-        'dill'],
-
+        "numpy >= 1.6",
+        "PyYAML==3.13",  # newer pyaml breaks models,
+        "astropy >= 1.2",
+        "scipy>=0.14",
+        "numdifftools",
+        "tables",
+        "pandas",
+        "dill",
+    ],
     extras_require={
-        'tests': [
-            'pytest', ],
-        'docs': [
-            'sphinx >= 1.4',
-            'sphinx_rtd_theme',
-            'nbsphinx',
-            'sphinx-autoapi']},
-
-    ext_modules=ext_modules_configuration,
-
-    package_data={
-        'astromodels': ['data/dark_matter/*'],
+        "tests": ["pytest"],
+        "docs": ["sphinx >= 1.4", "sphinx_rtd_theme", "nbsphinx", "sphinx-autoapi"],
     },
+    ext_modules=ext_modules_configuration,
+    package_data={"astromodels": ["data/dark_matter/*"]},
     include_package_data=True,
-
 )

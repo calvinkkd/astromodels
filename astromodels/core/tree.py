@@ -21,7 +21,6 @@ class NonExistingAttribute(RuntimeWarning):
 # This is necessary for pickle to be able to reconstruct a NewNode class (or derivate)
 # during unpickling
 class NewNodeUnpickler(object):
-
     def __call__(self, cls):
 
         instance = cls.__new__(cls)
@@ -35,8 +34,10 @@ class Node(_Node):
 
     def __init__(self, name):
 
-        assert is_valid_variable_name(name), "Illegal characters in name %s. You can only use letters and numbers, " \
-                                             "and _" % name
+        assert is_valid_variable_name(name), (
+            "Illegal characters in name %s. You can only use letters and numbers, "
+            "and _" % name
+        )
 
         assert name != "name", "You cannot call a node 'name', it is reserved."
 
@@ -48,9 +49,9 @@ class Node(_Node):
     def __reduce__(self):
 
         state = {}
-        state['children'] = self._get_children()
-        state['name'] = self.name
-        state['__dict__'] = self.__dict__
+        state["children"] = self._get_children()
+        state["name"] = self.name
+        state["__dict__"] = self.__dict__
 
         return NewNodeUnpickler(), (self.__class__,), state
 
@@ -58,17 +59,17 @@ class Node(_Node):
 
         # Set the children
 
-        self._add_children(state['children'])
+        self._add_children(state["children"])
 
         # Set the name of this node
 
-        self._change_name(state['name'])
+        self._change_name(state["name"])
 
         # Restore everything else
 
-        for k in state['__dict__']:
+        for k in state["__dict__"]:
 
-            self.__dict__[k] = state['__dict__'][k]
+            self.__dict__[k] = state["__dict__"][k]
 
     # This is necessary for copy.deepcopy to work
     def __deepcopy__(self, memodict={}):
@@ -133,14 +134,15 @@ class Node(_Node):
 
 
 class OldNode(object):
-
     def __init__(self, name):
 
         self._children = collections.OrderedDict()
         self._parent = None
 
-        assert is_valid_variable_name(name), "Illegal characters in name %s. You can only use letters and numbers, " \
-                                             "and _" % name
+        assert is_valid_variable_name(name), (
+            "Illegal characters in name %s. You can only use letters and numbers, "
+            "and _" % name
+        )
 
         self._name = name
 
@@ -174,7 +176,9 @@ class OldNode(object):
 
         if name in self._children:
 
-            raise DuplicatedNode("You cannot use the same name (%s) for different nodes" % name)
+            raise DuplicatedNode(
+                "You cannot use the same name (%s) for different nodes" % name
+            )
 
         self._children[name] = new_child
 
@@ -265,7 +269,9 @@ class OldNode(object):
 
     def _repr__base(self, rich_output):
 
-        raise NotImplementedError("You should implement the __repr__base method for each class")
+        raise NotImplementedError(
+            "You should implement the __repr__base method for each class"
+        )
 
     def __repr__(self):
         """

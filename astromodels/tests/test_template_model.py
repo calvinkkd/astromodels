@@ -2,12 +2,16 @@ import pytest
 import os
 import numpy as np
 
-from astromodels.functions.template_model import TemplateModel, TemplateModelFactory, MissingDataFile
+from astromodels.functions.template_model import (
+    TemplateModel,
+    TemplateModelFactory,
+    MissingDataFile,
+)
 from astromodels.functions.functions import Band, Powerlaw
 from astromodels import Model, PointSource, clone_model, load_model
 import pickle
 
-__author__ = 'giacomov'
+__author__ = "giacomov"
 
 
 def get_comparison_function():
@@ -25,26 +29,25 @@ def test_template_factory_1D():
 
     energies = np.logspace(1, 3, 50)
 
-    t = TemplateModelFactory('__test1D', 'A test template', energies, ['alpha'])
+    t = TemplateModelFactory("__test1D", "A test template", energies, ["alpha"])
 
     alpha_grid = np.linspace(-1.5, 1, 15)
-    #beta_grid = np.linspace(-3.5, -1.6, 15)
-    #xp_grid = np.logspace(1, 3, 20)
+    # beta_grid = np.linspace(-3.5, -1.6, 15)
+    # xp_grid = np.logspace(1, 3, 20)
 
-    t.define_parameter_grid('alpha', alpha_grid)
-
+    t.define_parameter_grid("alpha", alpha_grid)
 
     for a in alpha_grid:
         mo.alpha = a
         mo.beta = -2.5
-        mo.xp = 300.
-
+        mo.xp = 300.0
 
         t.add_interpolation_data(mo(energies), alpha=a)
 
     print("Data has been prepared")
 
     t.save_data(overwrite=True)
+
 
 @pytest.mark.slow
 def test_template_factory():
@@ -53,15 +56,17 @@ def test_template_factory():
 
     energies = np.logspace(1, 3, 50)
 
-    t = TemplateModelFactory('__test', 'A test template', energies, ['alpha', 'xp', 'beta'])
+    t = TemplateModelFactory(
+        "__test", "A test template", energies, ["alpha", "xp", "beta"]
+    )
 
     alpha_grid = np.linspace(-1.5, 1, 15)
     beta_grid = np.linspace(-3.5, -1.6, 15)
     xp_grid = np.logspace(1, 3, 20)
 
-    t.define_parameter_grid('alpha', alpha_grid)
-    t.define_parameter_grid('beta', beta_grid)
-    t.define_parameter_grid('xp', xp_grid)
+    t.define_parameter_grid("alpha", alpha_grid)
+    t.define_parameter_grid("beta", beta_grid)
+    t.define_parameter_grid("xp", xp_grid)
 
     for a in alpha_grid:
 
@@ -78,18 +83,16 @@ def test_template_factory():
 
     t.save_data(overwrite=True)
 
-    tm = TemplateModel('__test1D')
+    tm = TemplateModel("__test1D")
 
     tm(energies)
-
-
 
 
 # This will be run second, so the template will exist
 @pytest.mark.slow
 def test_template_function():
 
-    tm = TemplateModel('__test')
+    tm = TemplateModel("__test")
 
     mo = get_comparison_function()
 
@@ -126,14 +129,18 @@ def test_template_function():
 
                 if np.any(idx):
 
-                    raise AssertionError("Interpolation precision @ %s is %s, "
-                                         "worse than 10 percent, "
-                                         "with parameters %s!" % (new_energies[idx], deltas[idx], [a,b,xp]))
+                    raise AssertionError(
+                        "Interpolation precision @ %s is %s, "
+                        "worse than 10 percent, "
+                        "with parameters %s!"
+                        % (new_energies[idx], deltas[idx], [a, b, xp])
+                    )
+
 
 @pytest.mark.slow
 def test_input_output():
 
-    tm = TemplateModel('__test')
+    tm = TemplateModel("__test")
     tm.alpha = -0.95
     tm.beta = -2.23
 
@@ -151,7 +158,9 @@ def test_input_output():
 
     xx = np.linspace(1, 10, 100)
 
-    assert np.allclose(clone.test.spectrum.main.shape(xx), fake_model.test.spectrum.main.shape(xx))
+    assert np.allclose(
+        clone.test.spectrum.main.shape(xx), fake_model.test.spectrum.main.shape(xx)
+    )
 
     # Test pickling
     dump = pickle.dumps(clone)
@@ -160,7 +169,9 @@ def test_input_output():
 
     assert clone2.get_number_of_point_sources() == 1
     assert tm.data_file == clone2.test.spectrum.main.shape.data_file
-    assert np.allclose(clone2.test.spectrum.main.shape(xx), fake_model.test.spectrum.main.shape(xx))
+    assert np.allclose(
+        clone2.test.spectrum.main.shape(xx), fake_model.test.spectrum.main.shape(xx)
+    )
 
     # Test pickling with other functions
     new_shape = tm * Powerlaw()
@@ -184,7 +195,9 @@ def test_input_output():
     reloaded_model = load_model("__test.yml")
 
     assert reloaded_model.get_number_of_point_sources() == 1
-    assert np.allclose(fake_model2.test.spectrum.main.shape(xx), reloaded_model.test.spectrum.main.shape(xx))
+    assert np.allclose(
+        fake_model2.test.spectrum.main.shape(xx),
+        reloaded_model.test.spectrum.main.shape(xx),
+    )
 
     os.remove("__test.yml")
-

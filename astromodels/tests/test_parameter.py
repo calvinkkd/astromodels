@@ -1,25 +1,31 @@
 import astropy.units as u
 import pytest
 from astromodels.functions.priors import Uniform_prior, Log_uniform_prior
-from astromodels.functions.functions import  Powerlaw
+from astromodels.functions.functions import Powerlaw
 
-__author__ = 'giacomov'
+__author__ = "giacomov"
 
-from astromodels.core.parameter import Parameter, SettingOutOfBounds, \
-    CannotConvertValueToNewUnits, NotCallableOrErrorInCall, IndependentVariable, ParameterMustHaveBounds
+from astromodels.core.parameter import (
+    Parameter,
+    SettingOutOfBounds,
+    CannotConvertValueToNewUnits,
+    NotCallableOrErrorInCall,
+    IndependentVariable,
+    ParameterMustHaveBounds,
+)
 from astromodels.functions.functions import Line
 
 
 def test_default_constructor():
 
-    p = Parameter('test_parameter', 1.0, desc='Description')
+    p = Parameter("test_parameter", 1.0, desc="Description")
 
     assert p.min_value is None
     assert p.max_value is None
     assert p.value == 1.0
     assert isinstance(p.delta, float)
-    assert p.name == 'test_parameter'
-    assert p.description == 'Description'
+    assert p.name == "test_parameter"
+    assert p.description == "Description"
     assert p.fix == False
     assert p.free == True
     assert p.has_prior() == False
@@ -30,37 +36,37 @@ def test_default_constructor():
     # Test that we cannot call a parameter with a name with spaces in it
     with pytest.raises(AssertionError):
 
-        _ = Parameter('test parameter 2', 1.0)
+        _ = Parameter("test parameter 2", 1.0)
 
     # Test some failures cases
     with pytest.raises(ValueError):
 
-        _ = Parameter('test', 'pippo')
+        _ = Parameter("test", "pippo")
 
     with pytest.raises(ValueError):
-        _ = Parameter('test', 1.0, min_value='a')
+        _ = Parameter("test", 1.0, min_value="a")
 
     with pytest.raises(ValueError):
 
-        _ = Parameter('test', 1.0, max_value='b')
+        _ = Parameter("test", 1.0, max_value="b")
 
     with pytest.raises(TypeError):
 
-        _ = Parameter('test', 1.0, delta='b')
+        _ = Parameter("test", 1.0, delta="b")
 
     p.display()
 
 
 def test_default_constructor_units():
 
-    p = Parameter('test_parameter', 1.0 * u.keV, desc='Description')
+    p = Parameter("test_parameter", 1.0 * u.keV, desc="Description")
 
     assert p.min_value is None
     assert p.max_value is None
     assert p.value == 1.0
     assert isinstance(p.delta, float)
-    assert p.name == 'test_parameter'
-    assert p.description == 'Description'
+    assert p.name == "test_parameter"
+    assert p.description == "Description"
     assert p.fix == False
     assert p.free == True
     assert p.has_prior() == False
@@ -73,15 +79,25 @@ def test_default_constructor_units():
 
 def test_constructor_complete():
 
-    p = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test',
-                  free=False, unit=u.MeV, prior=Uniform_prior(), is_normalization=True)
+    p = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit=u.MeV,
+        prior=Uniform_prior(),
+        is_normalization=True,
+    )
 
     assert p.min_value == -5.0
     assert p.max_value == 5.0
     assert p.value == 1.0
     assert p.delta == 0.2
-    assert p.name == 'test_parameter'
-    assert p.description == 'test'
+    assert p.name == "test_parameter"
+    assert p.description == "test"
     assert p.fix == True
     assert p.free == False
     assert p.has_prior() == True
@@ -95,14 +111,14 @@ def test_constructor_complete():
 
 def test_conflicting_units_in_initial_value_and_unit_keyword():
 
-    p = Parameter('test_parameter', 1.0 * u.keV, desc='Description', unit=u.MeV)
+    p = Parameter("test_parameter", 1.0 * u.keV, desc="Description", unit=u.MeV)
 
     assert p.min_value is None
     assert p.max_value is None
     assert p.value == 1.0e-3
     assert isinstance(p.delta, float)
-    assert p.name == 'test_parameter'
-    assert p.description == 'Description'
+    assert p.name == "test_parameter"
+    assert p.description == "Description"
     assert p.fix == False
     assert p.free == True
     assert p.has_prior() == False
@@ -115,7 +131,7 @@ def test_conflicting_units_in_initial_value_and_unit_keyword():
 
 def test_constructor_with_boundaries():
 
-    p = Parameter('test_parameter', 1.0, min_value=-5, max_value=5)
+    p = Parameter("test_parameter", 1.0, min_value=-5, max_value=5)
 
     assert p.min_value == -5
     assert p.max_value == 5
@@ -125,7 +141,7 @@ def test_constructor_with_boundaries():
 
 def test_constructor_with_delta():
 
-    p = Parameter('test_parameter', 1.0, delta=0.3)
+    p = Parameter("test_parameter", 1.0, delta=0.3)
 
     assert p.delta == 0.3
 
@@ -134,7 +150,7 @@ def test_constructor_with_delta():
 
 def test_constructor_with_units():
 
-    p = Parameter('test_parameter', 1.0, unit=u.keV)
+    p = Parameter("test_parameter", 1.0, unit=u.keV)
 
     assert p.unit == u.keV
 
@@ -143,7 +159,7 @@ def test_constructor_with_units():
 
 def test_set_no_units():
 
-    p = Parameter('test_parameter',1.0)
+    p = Parameter("test_parameter", 1.0)
 
     p.value = 25.4
 
@@ -154,7 +170,7 @@ def test_set_no_units():
 
 def test_set_within_bounds_no_units():
 
-    p = Parameter('test_parameter',1.0, min_value = -2.0, max_value = 2.0)
+    p = Parameter("test_parameter", 1.0, min_value=-2.0, max_value=2.0)
 
     p.value = 1.5
 
@@ -165,7 +181,7 @@ def test_set_within_bounds_no_units():
 
 def test_set_outside_bounds_no_units():
 
-    p = Parameter('test_parameter',1.0, min_value = -2.0, max_value = 2.0)
+    p = Parameter("test_parameter", 1.0, min_value=-2.0, max_value=2.0)
 
     with pytest.raises(SettingOutOfBounds):
 
@@ -180,7 +196,7 @@ def test_set_outside_bounds_no_units():
 
 def test_set_units():
 
-    p = Parameter('test_parameter',1.0, unit=u.keV)
+    p = Parameter("test_parameter", 1.0, unit=u.keV)
 
     p.value = 3.0 * u.MeV
 
@@ -207,7 +223,13 @@ def test_set_units():
 
 def test_set_within_bounds_units():
 
-    p = Parameter('test_parameter',1.0 * u.keV, min_value = -2.0 * u.MeV, max_value = 2.0 * u.MeV, unit=u.keV)
+    p = Parameter(
+        "test_parameter",
+        1.0 * u.keV,
+        min_value=-2.0 * u.MeV,
+        max_value=2.0 * u.MeV,
+        unit=u.keV,
+    )
 
     p.value = 1.2 * u.MeV
 
@@ -218,7 +240,13 @@ def test_set_within_bounds_units():
 
 def test_set_outside_bounds_units():
 
-    p = Parameter('test_parameter', 1.0 * u.keV, min_value = -2.0 * u.MeV, max_value = 2.0 * u.MeV, unit=u.keV)
+    p = Parameter(
+        "test_parameter",
+        1.0 * u.keV,
+        min_value=-2.0 * u.MeV,
+        max_value=2.0 * u.MeV,
+        unit=u.keV,
+    )
 
     with pytest.raises(SettingOutOfBounds):
 
@@ -233,9 +261,9 @@ def test_set_outside_bounds_units():
 
 def test_set_bounds_nounits():
 
-    p = Parameter('test_parameter', 1.0)
+    p = Parameter("test_parameter", 1.0)
 
-    p.bounds = (-2.0 ,2.0)
+    p.bounds = (-2.0, 2.0)
 
     assert p.min_value == -2.0
     assert p.max_value == 2.0
@@ -250,7 +278,7 @@ def test_set_bounds_nounits():
 
 def test_set_bounds_units():
 
-    p = Parameter('test_parameter', 1.0 * u.keV)
+    p = Parameter("test_parameter", 1.0 * u.keV)
 
     p.bounds = (-2.0 * u.MeV, 2.0 * u.eV)
 
@@ -262,7 +290,7 @@ def test_set_bounds_units():
 
 def test_set_delta_nounits():
 
-    p = Parameter('test_parameter', 1.0)
+    p = Parameter("test_parameter", 1.0)
 
     p.delta = 0.5
 
@@ -273,7 +301,7 @@ def test_set_delta_nounits():
 
 def test_set_delta_units():
 
-    p = Parameter('test_parameter', 1.0, unit='GeV')
+    p = Parameter("test_parameter", 1.0, unit="GeV")
 
     p.delta = 500 * u.MeV
 
@@ -284,7 +312,16 @@ def test_set_delta_units():
 
 def test_duplicate():
 
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     p2 = p1.duplicate()
 
@@ -297,7 +334,7 @@ def test_duplicate():
 def test_get_randomized_value():
 
     # Test randomization no boundaries (normal distribution)
-    p1 = Parameter('test_parameter', 1.0)
+    p1 = Parameter("test_parameter", 1.0)
 
     val2 = p1.get_randomized_value(0.1)
 
@@ -305,7 +342,16 @@ def test_get_randomized_value():
 
     # Test the randomized value with truncated normal, i.e., with boundaries
 
-    p2 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test', free=False, unit='MeV')
+    p2 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     val1 = p2.get_randomized_value(0.1)
 
@@ -330,7 +376,16 @@ def test_get_randomized_value():
 
 
 def test_set_remove_minimum():
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     p1.remove_minimum()
 
@@ -343,7 +398,16 @@ def test_set_remove_minimum():
 
 def test_set_remove_maximum():
 
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     p1.remove_maximum()
 
@@ -356,9 +420,18 @@ def test_set_remove_maximum():
 
 def test_set_auxiliary_variable():
 
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
-    x = Parameter('aux_variable', 1.0)
+    x = Parameter("aux_variable", 1.0)
 
     # ax + b
 
@@ -395,12 +468,20 @@ def test_set_auxiliary_variable():
     p1.display()
 
 
-
 def test_remove_auxiliary_variable():
 
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
-    x = Parameter('aux_variable', 1.0)
+    x = Parameter("aux_variable", 1.0)
 
     # ax + b
 
@@ -431,10 +512,18 @@ def test_remove_auxiliary_variable():
 
 def test_callback():
 
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     class Callback(object):
-
         def __init__(self):
 
             self._control_value = None
@@ -476,7 +565,9 @@ def test_callback():
 
 def test_to_dict():
 
-    p1 = IndependentVariable('time', 1.0, min_value=-5.0, max_value=5.0, desc='test', unit='MeV')
+    p1 = IndependentVariable(
+        "time", 1.0, min_value=-5.0, max_value=5.0, desc="test", unit="MeV"
+    )
 
     repr = p1.to_dict(minimal=False)
 
@@ -485,18 +576,35 @@ def test_to_dict():
     repr2 = p1.to_dict(minimal=True)
 
     assert len(repr2.keys()) == 1
-    assert 'value' in repr2
+    assert "value" in repr2
 
-    assert repr2['value'] == p1.value
+    assert repr2["value"] == p1.value
 
-    p = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0,
-                   delta=0.2, desc='test', free=False, unit='MeV')
+    p = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     p.to_dict()
     p.to_dict(minimal=True)
 
-    p = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0,
-                  delta=0.2, desc='test', free=False, unit='MeV', prior=Log_uniform_prior())
+    p = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+        prior=Log_uniform_prior(),
+    )
 
     p.to_dict()
     p.to_dict(minimal=True)
@@ -504,7 +612,9 @@ def test_to_dict():
 
 def test_independent_variable_representation():
 
-    p1 = IndependentVariable('time', 1.0, min_value=-5.0, max_value=5.0, desc='test', unit='MeV')
+    p1 = IndependentVariable(
+        "time", 1.0, min_value=-5.0, max_value=5.0, desc="test", unit="MeV"
+    )
 
     print(p1._repr__base(False))
     print(p1._repr__base(True))
@@ -512,8 +622,16 @@ def test_independent_variable_representation():
 
 def test_prior():
 
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0,
-                   delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     my_prior = Uniform_prior()
 
@@ -521,13 +639,13 @@ def test_prior():
 
     assert my_prior == p1.prior
 
-    custom_prior = lambda x:x**2
+    custom_prior = lambda x: x ** 2
 
     with pytest.raises(NotCallableOrErrorInCall):
 
         p1.prior = custom_prior
 
-    invalid_prior = lambda x,y: x*y
+    invalid_prior = lambda x, y: x * y
 
     with pytest.raises(NotCallableOrErrorInCall):
 
@@ -565,25 +683,41 @@ def test_prior():
 
 def test_remove_prior():
 
-    p1 = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0,
-                   delta=0.2, desc='test', free=False, unit='MeV')
+    p1 = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     my_prior = Uniform_prior()
 
     p1.prior = my_prior
 
-    assert p1.has_prior()==True
+    assert p1.has_prior() == True
 
     # Now remove it
     p1.prior = None
 
-    assert p1.has_prior()==False
+    assert p1.has_prior() == False
 
 
 def test_as_quantity():
 
-    p = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0,
-                  delta=0.2, desc='test', free=False, unit='MeV')
+    p = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     assert isinstance(p.as_quantity, u.Quantity)
     assert p.as_quantity.to("keV").value == 1000.0
@@ -591,15 +725,22 @@ def test_as_quantity():
 
 def test_in_unit_of():
 
-    p = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0,
-                  delta=0.2, desc='test', free=False, unit='MeV')
+    p = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit="MeV",
+    )
 
     assert p.in_unit_of(u.keV) == 1000.0
     assert p.in_unit_of(u.keV, as_quantity=True).to("MeV").value == 1.0
 
 
 class Callback(object):
-
     def __init__(self):
 
         self._control_value = None
@@ -613,8 +754,17 @@ def test_pickle():
 
     import cPickle
 
-    p_orig = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test',
-                       free=False, unit=u.MeV, prior=Uniform_prior())
+    p_orig = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit=u.MeV,
+        prior=Uniform_prior(),
+    )
 
     # Add a callback
 
@@ -634,8 +784,8 @@ def test_pickle():
     assert p.max_value == 5.0
     assert p.value == 1.0
     assert p.delta == 0.2
-    assert p.name == 'test_parameter'
-    assert p.description == 'test'
+    assert p.name == "test_parameter"
+    assert p.description == "test"
     assert p.fix == True
     assert p.free == False
     assert p.has_prior() == True
@@ -649,17 +799,27 @@ def test_pickle():
 
     assert callback._control_value == p.value
 
+
 def test_links_and_pickle():
 
     import cPickle
 
-    p_orig = Parameter('test_parameter', 1.0, min_value=-5.0, max_value=5.0, delta=0.2, desc='test',
-                       free=False, unit=u.MeV, prior=Uniform_prior())
+    p_orig = Parameter(
+        "test_parameter",
+        1.0,
+        min_value=-5.0,
+        max_value=5.0,
+        delta=0.2,
+        desc="test",
+        free=False,
+        unit=u.MeV,
+        prior=Uniform_prior(),
+    )
 
     # Test the linkinking and pickle
 
     # Add a link
-    x = Parameter('aux_variable', 1.0)
+    x = Parameter("aux_variable", 1.0)
 
     # ax + b
 

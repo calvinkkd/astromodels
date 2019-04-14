@@ -2,7 +2,6 @@ import numpy as np
 
 
 class ParameterTransformation(object):
-
     def forward(self, external_value):
 
         raise NotImplementedError("You have to implement this")
@@ -13,12 +12,11 @@ class ParameterTransformation(object):
 
 
 class LogarithmicTransformation(ParameterTransformation):
-
     def forward(self, external_value):
 
         #  Throw an error if taking the logarithm of a negative number (or nan)
 
-        with np.errstate(invalid='raise'):
+        with np.errstate(invalid="raise"):
 
             res = np.log10(external_value)
 
@@ -26,10 +24,10 @@ class LogarithmicTransformation(ParameterTransformation):
 
     def backward(self, internal_value):
 
-        return 10**internal_value
+        return 10 ** internal_value
 
 
-_known_transformations = {'log10': LogarithmicTransformation}
+_known_transformations = {"log10": LogarithmicTransformation}
 
 
 def get_transformation(transformation_name):
@@ -39,7 +37,6 @@ def get_transformation(transformation_name):
     :param transformation_name:
     :return: instance of transformation with provided name
     """
-
 
     if not transformation_name in _known_transformations:
 

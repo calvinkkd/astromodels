@@ -1,4 +1,4 @@
-__author__ = 'giacomov'
+__author__ = "giacomov"
 
 import collections
 
@@ -30,8 +30,10 @@ class ParticleSource(Source, Node):
 
         if components is None:
 
-            assert distribution_shape is not None, "You have to either provied a list of components, or a " \
-                                                   "distribution shape"
+            assert distribution_shape is not None, (
+                "You have to either provied a list of components, or a "
+                "distribution shape"
+            )
 
             components = [SpectralComponent("main", distribution_shape)]
 
@@ -39,7 +41,7 @@ class ParticleSource(Source, Node):
 
         # Add a node called 'spectrum'
 
-        spectrum_node = Node('spectrum')
+        spectrum_node = Node("spectrum")
         spectrum_node._add_children(self._components.values())
 
         self._add_child(spectrum_node)
@@ -79,14 +81,14 @@ class ParticleSource(Source, Node):
 
         repr_dict = collections.OrderedDict()
 
-        key = '%s (particle source)' % self.name
+        key = "%s (particle source)" % self.name
 
         repr_dict[key] = collections.OrderedDict()
-        repr_dict[key]['spectrum'] = collections.OrderedDict()
+        repr_dict[key]["spectrum"] = collections.OrderedDict()
 
         for component_name, component in self.components.iteritems():
 
-            repr_dict[key]['spectrum'][component_name] = component.to_dict(minimal=True)
+            repr_dict[key]["spectrum"][component_name] = component.to_dict(minimal=True)
 
         return dict_to_list(repr_dict, rich_output)
 
@@ -129,5 +131,3 @@ class ParticleSource(Source, Node):
                 all_parameters[par.path] = par
 
         return all_parameters
-
-
