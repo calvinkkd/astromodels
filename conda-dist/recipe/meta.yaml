@@ -38,6 +38,7 @@ requirements:
     - pytables
     - pandas
     - dill
+    - xspec-modelsonly-lite
 
 build:
   script: python -m pip install --verbose --no-deps --ignore-installed .
