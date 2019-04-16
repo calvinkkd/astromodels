@@ -1,7 +1,6 @@
 sudo: required
 
-language: python
-python: '2.7'
+language: generic
 
 services:
   - docker
@@ -10,6 +9,7 @@ os:
   - linux
   - osx
 osx_image: xcode10.2
+language: shell  
 
 before_install:
   - |
